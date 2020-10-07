@@ -67,6 +67,14 @@ enableEmoji = true
         url = "/categories/"
         title = ""
         weight = 3
+      [[languages.en.menu.main]]
+	identifier = "about"
+	pre = ""
+	post = ""
+	name = "About"
+	url = "/about/"
+	title = ""
+	weight = 4
     [languages.en.params]
       # site description
       description = "Ramblings in Technology"
