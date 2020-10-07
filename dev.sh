@@ -1,1 +1,1 @@
-hugo server --bind 0.0.0.0 -D --disableFastRender
+hugo server --bind 0.0.0.0 -D --verbose
