@@ -1,7 +1,7 @@
 ---
 title: "Ceph Lab"
 date: 2020-10-07T17:09:19Z
-draft: false
+draft: true
 asciinema: true
 description: "Building a Ceph test-lab"
 categories: ["Lab","Ceph"]
