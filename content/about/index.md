@@ -2,21 +2,22 @@
 title: "About"
 date: 2020-10-07T13:13:16Z
 draft: false
+toc: true
 ---
 
 ## Me
 
-I've worked within the technology industry for approximately 20 years now (wow - feeling old!).  I'm currently working at Red Hat as a Senior Architect within the consulting team, assisting customers delivering complex IT solutions.  I predominantly work in the storage and container ecosystems.
+I've worked within the technology industry for approximately 20 years now (wow - feeling old!).  I'm currently working at Red Hat as a Senior Architect within the consulting team, assisting customers delivering complex IT solutions.  I predominantly work in the storage and container ecosystems but have an interest in most things Linux related.
 
 Prior to this I worked in the hosting industry delivering complex solutions on a global scale.
 
-I have a strong interest in storage technologies so will likely waffle on about that a lot.
+The purpose of this site is for me to write about things I've found interesting, either via working on them for clients or general interest.
 
 Opinions expressed are my own and not related to/endorsed by my employeer in any fashion.
 
 ## This Website
 
-This website is entirely a static website.  It's stored in its entirity within [GitHub](https://github.com/jameswilkins/blog). I utilise [Hugo](https://gohugo.io) to generate an entirly static site from the files stored within git.
+This website is entirely a static website.  It's stored in its entirity within [GitHub](https://github.com/jameswilkins/blog). I utilise [Hugo](https://gohugo.io) to generate a static site from the files stored within git.
 
 Those generated site is then hosted by [NetLify](https://netlify.com) on a global CDN network.
 

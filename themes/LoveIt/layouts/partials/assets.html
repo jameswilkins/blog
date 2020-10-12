@@ -205,3 +205,8 @@
 {{- end -}}
 
 {{- partial "plugin/analytics.html" . -}}
+
+{{ if .Params.asciinema }}
+    <script src="{{ .Site.BaseURL }}js/asciinema-player.js"></script>
+{{ end }}
+
