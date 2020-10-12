@@ -24,10 +24,7 @@ osdmap e523 pool 'test-pool' (15) object 'open.repo' -> pg 15.44fb73c5 (15.5) ->
 ```
 
 
-{{< image src="/images/test.png" >}}
 
-
-{{< asciinema key="lab.cast" rows="10" preload="1" >}}
 
 
 
