@@ -397,7 +397,7 @@ Installation with script:
 
 ## Next Steps
 
-Now you're ready to move onto the next part of the instructions and [install Ceph]({{<relref "install-ceph.md" >}})
+Now you're ready to move onto the next part of the instructions and [install Ceph]({{<relref "#install-ceph.md" >}})
 
 
 

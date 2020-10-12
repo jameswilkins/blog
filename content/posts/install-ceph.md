@@ -50,4 +50,3 @@ rh_poolid - The PoolID for your subscription that has the Red Hat Ceph packages 
 ```
 
 
-Foo Bar Foo
