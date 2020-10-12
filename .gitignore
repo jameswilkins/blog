@@ -1,5 +1,6 @@
 public/*
 /resources/_gen/*
 
+*.bak
 # Local Netlify folder
 .netlify

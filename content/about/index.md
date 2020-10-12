@@ -13,15 +13,15 @@ Prior to this I worked in the hosting industry delivering complex solutions on a
 
 The purpose of this site is for me to write about things I've found interesting, either via working on them for clients or general interest.
 
-Opinions expressed are my own and not related to/endorsed by my employeer in any fashion.
+Opinions expressed are my own and not related to/endorsed by my employer in any fashion.
 
 ## This Website
 
-This website is entirely a static website.  It's stored in its entirity within [GitHub](https://github.com/jameswilkins/blog). I utilise [Hugo](https://gohugo.io) to generate a static site from the files stored within git.
+This website is entirely a static website.  It's stored in its entirety within [GitHub](https://github.com/jameswilkins/blog). I utilise [Hugo](https://gohugo.io) to generate a static site from the files stored within git.
 
 Those generated site is then hosted by [NetLify](https://netlify.com) on a global CDN network.
 
-Updates are made by editing on my local workstation and commiting into git.
+Updates are made by editing on my local workstation and committing into git.
 
 ### Infrastructure
 
@@ -29,34 +29,34 @@ Updates are made by editing on my local workstation and commiting into git.
 
 I utilise [Cloudflare](https://cloudflare.com) to both host the DNS and initial ingress point for the website.
 
-SSL is terminated at CloudFlare and then re-encrypted back onto NetLify.
+SSL is terminated at Cloudflare and then re-encrypted back onto NetLify.
 
 I opted for this approach versus hosting everything with NetLify for a few reasons;
 
 * I like to keep my DNS all in one place as I have other domain names
 * I admire CloudFlare's approach to enabling new technologies (for example, HTTP/3) rapidly
-* CloudFlare performs a series of optimisations on the website to ensure it load's quickly
+* Cloudflare performs a series of optimisations on the website to ensure it load's quickly
 
 #### NetLify
 
 NetLify performs the site construction and publishes the website to their world-wide CDN network.
 
-The site on NetLify has a custom SSL certificate (CloudFlare Origin certificate) which is used to encrypt traffic between CloudFlare <=> NetLify
+The site on NetLify has a custom SSL certificate (Cloudflare Origin certificate) which is used to encrypt traffic between Cloudflare <=> NetLify
 
-#### Github
+#### GitHub
 
 The main site is hosted in GitHub [here](https://github.com/jameswilkins/blog).  
 
-I also make use of [GitHub LFS](https://docs.github.com/en/free-pro-team@latest/github/managing-large-files/working-with-large-files) for specific directories that contain images/other-specific content.  This is to prevent the main repo filling up with (non-necesary) versioning information for these data-types.
+I also make use of [GitHub LFS](https://docs.github.com/en/free-pro-team@latest/github/managing-large-files/working-with-large-files) for specific directories that contain images/other-specific content.  This is to prevent the main repo filling up with (non-necessary) versioning information for these data-types.
 
 #### Workflow
 
 Posting updates to the web-site works like so
 
-* Checkout github repository 
+* Checkout GitHub repository 
 * Update content / create new post
-* Commit into github
-* NetLify triggers a build once git is updated - it checks out the content from git, applies the hugo generator to the site and then publishes it on a specific URL.  A sample deployment is below
+* Commit into GitHub
+* NetLify triggers a build once git is updated - it checks out the content from git, applies the Hugo generator to the site and then publishes it on a specific URL.  A sample deployment is below
 
 ```
 3:36:43 PM: Build ready to start
