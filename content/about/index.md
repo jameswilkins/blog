@@ -17,7 +17,7 @@ Opinions expressed are my own and not related to/endorsed by my employer in any 
 
 ## This Website
 
-This website is entirely a static website.  It's stored in its entirety within [GitHub](https://github.com/jameswilkins/blog). I utilise [Hugo](https://gohugo.io) to generate a static site from the files stored within git.
+This website is a static website.  It's stored in its entirety within [GitHub](https://github.com/jameswilkins/blog). I utilise [Hugo](https://gohugo.io) to generate a static site from the files stored within git.
 
 Those generated site is then hosted by [NetLify](https://netlify.com) on a global CDN network.
 
