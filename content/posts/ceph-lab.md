@@ -1,8 +1,8 @@
 ---
 title: "Ceph Lab"
 date: 2020-10-07T17:09:19Z
-draft: true
-asciinema: true
+draft: false
+asciinema: false
 description: "Building a Ceph test-lab"
 categories: ["Lab","Ceph"]
 tags: ['Lab','Ceph','Storage']
@@ -20,11 +20,15 @@ We're aiming for a fully functional Ceph cluster with the ability to utilise blo
 * 1 Virtual-machine to act as our ceph bastion and test-client box
 * 3 Virtual-machines running the appropiate ceph-daemons
 * All of the above running a seperate network to keep things tidy and organised
+* We'll end up with the following at the end
 
-ceph-bastion - 172.16.200.10
-ceph-01 - 172.16.200.20
-ceph-02 - 172.16.200.21
-ceph-03 - 172.16.200.22
+|Hostname   |IP Address   |
+|---|---|
+|ceph-bastion   | 172.16.200.10  |
+|ceph-01   | 172.16.200.20  |
+|ceph-02   | 172.16.200.21  |
+|ceph-03   | 172.16.200.22  |
+
 
 ## Pre-requisites
 
@@ -69,7 +73,7 @@ SHA256:zfFsmOnL2+OvG9Cx4XfEH6pSjsT7BrR8tPhe76qTBEo root@dev.lab.flumpy.net
 
 I've created a series of static configuration files to cover the hosts file and networking configuration.  We'll use these to embed into the virtual machines as we build them.
 
-Clone the git repository into a local directory for usage later.
+Clone the git repository into a local directory for usage later.  Let's also set an environment variable so we can reference this location later.
 
 ```bash
 # git clone https://github.com/jameswilkins/lab-parts.git
@@ -80,6 +84,7 @@ remote: Compressing objects: 100% (8/8), done.
 remote: Total 18 (delta 3), reused 18 (delta 3), pack-reused 0
 Unpacking objects: 100% (18/18), done.
 
+# GIT_LAB=/tmp/lab-parts
 ```
 
 ## Define custom network within libvirt
@@ -103,46 +108,45 @@ Custom networks within lib-virt can be defined via an xml file
 
 This will create a new bridge interface (virbr666) with an ip address 0f 172.16.200.1.  We allocate .10 to .249 for usage by DHCP.
 
+
 Configure within libvirt by doing
 ```bash
-virsh net-define ~/sites/lab-parts/ceph-lab/test-ceph.xml
-Network ceph-lab defined from /home/james/sites/lab-parts/ceph-lab/test-ceph.xml
 
-virsh net-start ceph-lab
+[root@dev tmp]# virsh net-define $GIT_LAB/ceph-lab/network/ceph-lab.xml
+Network ceph-lab defined from /tmp/lab-parts/ceph-lab/network/ceph-lab.xml
+
+[root@dev tmp]# virsh net-start ceph-lab
 Network ceph-lab started
 
-virsh net-autostart ceph-lab
+[root@dev tmp]# virsh net-autostart ceph-lab
 Network ceph-lab marked as autostarted
+
 ```
 
 And then we can verify the bridge is up and running
 
 ```bash
-$ ip ad sh virbr666
-9: virbr666: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default qlen 1000
-    link/ether 52:54:00:37:49:79 brd ff:ff:ff:ff:ff:ff
+[root@dev tmp]# ip ad sh virbr666
+35: virbr666: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default qlen 1000
+    link/ether 52:54:00:4a:e1:da brd ff:ff:ff:ff:ff:ff
     inet 172.16.200.1/24 brd 172.16.200.255 scope global virbr666
        valid_lft forever preferred_lft forever
-
 ```
 
 For good measure we can ping the default-gateway to confirm connectivity
 
 ```bash
-$ ping 172.16.200.1
+[root@dev tmp]# ping -c 2 172.16.200.1
 PING 172.16.200.1 (172.16.200.1) 56(84) bytes of data.
-64 bytes from 172.16.200.1: icmp_seq=1 ttl=64 time=0.088 ms
+64 bytes from 172.16.200.1: icmp_seq=1 ttl=64 time=0.083 ms
+64 bytes from 172.16.200.1: icmp_seq=2 ttl=64 time=0.088 ms
 ```
 
 ## Create our VMs
 
 Next we'll configure a series of VM's to house our ceph lab.  We'll be storing the VM's in /var/lib/libvirt/images.
 
-We're using virt-customize from the libguestfs project in order to inject paramters into our virtual machines.  We also use some of the config files stored in git to assist with configuration.  Let's setup a variable to point towards where you checked out the repository.  Ensure this matches your exact directory name.
-
-```
-GIT_DIR=/home/james/sites/lab-parts/ceph-lab
-```
+We're using virt-customize from the libguestfs project in order to inject paramters into our virtual machines.  We also use some of the config files stored in git to assist with configuration.
 
 ### Ceph-Bastion - 172.16.200.10
 
@@ -153,10 +157,10 @@ Create empty base-OS disk
 Formatting '/var/lib/libvirt/images/ceph-bastion.qcow2', fmt=qcow2 size=64424509440 cluster_size=65536 lazy_refcounts=off refcount_bits=16
 ```
 
-Copy RHEL82 template into our new base-OS disk.  This will also resize /dev/sda3 (/) to fit our newly sized base-OS disk.
+Copy the RHEL82 template into our new base-OS disk.  This will also resize /dev/sda3 (/) to fit our newly sized base-OS disk.
 
 ```bash
-# virt-resize --expand /dev/sda3 /var/lib/libvirt/images/rhel-8.2-x86_64-kvm.qcow2 /var/lib/lib                                                         virt/images/ceph-bastion.qcow2
+# virt-resize --expand /dev/sda3 /var/lib/libvirt/images/rhel-8.2-x86_64-kvm.qcow2 /var/lib/libvirt/images/ceph-bastion.qcow2
 ```
 
 Expected Output:
@@ -190,13 +194,13 @@ Now we move onto injecting the network & ssh configuration information.
 
 ```bash
 # virt-customize -a /var/lib/libvirt/images/ceph-bastion.qcow2 \
->   --root-password password:password \
->   --uninstall cloud-init \
->   --hostname ceph-bastion.ceph.lab \
->   --copy-in $GIT_DIR/config/hosts:/etc/ \
->   --copy-in $GIT_DIR/config/ceph-bastion/ifcfg-eth0:/etc/sysconfig/network-scripts/ \
->   --ssh-inject root:file:/root/.ssh/id_rsa.pub \
->   --selinux-relabel
+   --root-password password:password \
+   --uninstall cloud-init \
+   --hostname ceph-bastion.ceph.lab \
+   --copy-in $GIT_LAB/ceph-lab/config/hosts:/etc/ \
+   --copy-in $GIT_LAB/ceph-lab/config/ceph-bastion/ifcfg-eth0:/etc/sysconfig/network-scripts/ \
+   --ssh-inject root:file:/root/.ssh/id_rsa.pub \
+   --selinux-relabel
 ```
 
 Expected Output
@@ -217,19 +221,20 @@ Expected Output
 
 Then we'll use virt-install to define the parameters for our VM and store this in an xml file.  
 
-
+{{< admonition type=tip title="Expected Output" open=true >}}
 This command won't generate any console output - we're creating an xml file at this stage
+{{< /admonition >}}
 
 ```bash
 # virt-install --name ceph-bastion\
->   --virt-type kvm --memory 2048 --vcpus 2 \
->   --boot hd,menu=on \
->   --disk path=/var/lib/libvirt/images/ceph-bastion.qcow2,device=disk,bus=scsi,discard='unmap' \
->   --graphics none \
->   --os-type Linux --os-variant rhel8.2 \
->   --network network:ceph-lab \
->   --noautoconsole \
->   --dry-run --print-xml >ceph-bastion.xml
+   --virt-type kvm --memory 2048 --vcpus 2 \
+   --boot hd,menu=on \
+   --disk path=/var/lib/libvirt/images/ceph-bastion.qcow2,device=disk,bus=scsi,discard='unmap' \
+   --graphics none \
+   --os-type Linux --os-variant rhel8.2 \
+   --network network:ceph-lab \
+   --noautoconsole \
+   --dry-run --print-xml >ceph-bastion.xml
 ```
 
 The XML file contains the neccessary information about our virtual machine
@@ -308,10 +313,11 @@ After a short period of time the ceph-bastion box will come online
 ```bash
 # ping 172.16.200.10
 PING 172.16.200.10 (172.16.200.10) 56(84) bytes of data.
-64 bytes from 172.16.200.10: icmp_seq=9 ttl=64 time=0.254 ms
-64 bytes from 172.16.200.10: icmp_seq=10 ttl=64 time=0.171 ms
+64 bytes from 172.16.200.10: icmp_seq=1 ttl=64 time=0.321 ms
+64 bytes from 172.16.200.10: icmp_seq=2 ttl=64 time=0.239 ms
 ```
 
+### Ceph Nodes
 Now we rinse and repeat for the next three virtual machines in our list.
 
 ```bash
@@ -325,11 +331,60 @@ done
 
 for i in {01,02,03}; 
 do
-  virt-resize --expand /dev/sda3 /var/lib/libvirt/images/rhel-8.2-x86_64-kvm.qcow2 /var/lib/libvirt/images/ceph-01.qcow2
+  virt-resize --expand /dev/sda3 /var/lib/libvirt/images/rhel-8.2-x86_64-kvm.qcow2 /var/lib/libvirt/images/ceph-$i.qcow2
+  virt-customize -a /var/lib/libvirt/images/ceph-$i.qcow2 \
+    --root-password password:password \
+    --uninstall cloud-init \
+    --hostname ceph-$i.ceph.lab \
+    --copy-in $GIT_LAB/ceph-lab/config/hosts:/etc/ \
+    --copy-in $GIT_LAB/ceph-lab/config/ceph-$i/ifcfg-eth0:/etc/sysconfig/network-scripts/ \
+    --ssh-inject root:file:/root/.ssh/id_rsa.pub \
+    --selinux-relabel
+  virt-install --name ceph-$i \
+    --virt-type kvm --memory 4096 --vcpus 2 \
+    --boot hd,menu=on \
+    --disk path=/var/lib/libvirt/images/ceph-$i.qcow2,device=disk,bus=scsi,discard='unmap' \
+    --disk path=/var/lib/libvirt/images/ceph-$i-diska.qcow2,bus=scsi,discard='unmap' \
+    --disk path=/var/lib/libvirt/images/ceph-$i-diskb.qcow2,bus=scsi,discard='unmap' \
+    --graphics none \
+    --os-type Linux --os-variant rhel8.2 \
+    --network network:ceph-lab \
+    --noautoconsole \
+    --dry-run --print-xml >ceph-$i.xml
+  virsh define ./ceph-$i.xml
+  virsh start ceph-$i
+
+
 done
 
 ```
 
+## Verification
+
+Once complete, let's verify we have the expected machines.
+
+```bash
+# virsh list
+ Id    Name                           State
+----------------------------------------------------
+ 96    ceph-bastion                   running
+ 100   ceph-01                        running
+ 104   ceph-02                        running
+ 108   ceph-03                        running
+```
+
+You should also find that ssh works to the bastion server.
+
+```bash
+[root@dev tmp]# ssh root@172.16.200.10
+Activate the web console with: systemctl enable --now cockpit.socket
+
+This system is not registered to Red Hat Insights. See https://cloud.redhat.com/
+To register this system, run: insights-client --register
+
+Last login: Mon Oct 12 14:24:40 2020 from 172.16.200.1
+[root@ceph-bastion ~]#
+```
 ## QuickStart / Lazy Method {#QuickStart}
 
 If you don't want to follow the instructions above, i've included a simple bash script within the repository that will perform all of these steps for you.
@@ -339,5 +394,10 @@ Please read the script (as you should with anything you download from the intern
 Installation with script:
 
 <script id="asciicast-z4CPB8xsv6pTtiyGUuemaczGO" src="https://asciinema.org/a/z4CPB8xsv6pTtiyGUuemaczGO.js" async></script>
+
+## Next Steps
+
+Now you're ready to move onto the next part of the instructions and [install Ceph]({{<relref "install-ceph.md" >}})
+
 
 
